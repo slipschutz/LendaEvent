@@ -74,7 +74,7 @@ void Introspective::DefineCorrection(string time, string otherVar,vector<Double_
     i.channel =channel;
     stringstream s;
     s<<time<<":"<<otherVar<<"ch_"<<channel;
-    correctionsMap[s.str()]=i;
+    correctionsMap.push_back(make_pair(s.str(),i));
     mapForCorrectionResults[s.str()]=correctionCount;
     correctionCount++;
     theDynamicCorrectionResults.resize(correctionCount,-1);
@@ -86,9 +86,9 @@ void Introspective::DefineCorrection(string time, string otherVar,vector<Double_
 
 
 void Introspective::DumpCorrectionsMap(){
-
+  
   cout<<"\n****Dumping Dynamically defined corrections****\n"<<endl;
-  for (map <string,CorrectionInfo>::iterator ii=correctionsMap.begin();ii!=correctionsMap.end();++ii){
+  for (vector <pair<string,CorrectionInfo> >::iterator ii=correctionsMap.begin();ii!=correctionsMap.end();++ii){
     if (Get(ii->second.firstName) != NULL && Get(ii->second.secondName)!=NULL){
       cout<<"Correction for variables "<<ii->first<<" For Channel "<<ii->second.channel<<endl;
       
@@ -124,7 +124,7 @@ void Introspective::DumpIntrospective(){
   DumpResultVector();
 }
 
-
+/*
 void Introspective::PrintCorrection(string in){
   if (correctionsMap.find(in) == correctionsMap.end() ){
 
@@ -147,17 +147,18 @@ void Introspective::PrintCorrection(string in){
     }
   }
 }
- 
+*/
 
 void Introspective::ApplyDynamicCorrections(){
   int spot=-1;
-  for (map <string,CorrectionInfo>::iterator ii=correctionsMap.begin();ii!=correctionsMap.end();++ii){  
-    CorrectionInfo theInfo = ii->second;
-
-    if (mapForCorrectionResults.find(ii->first) != mapForCorrectionResults.end() ){
+  //  for (map <string,CorrectionInfo>::iterator ii=correctionsMap.begin();ii!=correctionsMap.end();++ii){  
+  for (int ii=0;ii<correctionsMap.size();ii++){ 
+    CorrectionInfo theInfo = correctionsMap[ii].second;
+    string theName = correctionsMap[ii].first;
+    if (mapForCorrectionResults.find(theName) != mapForCorrectionResults.end() ){
       //      cout<<"Apply correction for "<<ii->first<<endl;
-      
-      spot=mapForCorrectionResults[ii->first];//get the spot for this correction
+      cout<<"Applying the correction to "<<theName<<endl;
+      spot=mapForCorrectionResults[theName];//get the spot for this correction
       //Calculate the correction;
 
       int degree = theInfo.coefs.size();
@@ -168,8 +169,9 @@ void Introspective::ApplyDynamicCorrections(){
       theDynamicCorrectionResults[spot]=(*theInfo.time-tempTotal);
 
     } else {
-      cout<<"*** Warning the correction "<<ii->first<<" not found"<<endl;
+      cout<<"*** Warning the correction "<<theName<<" not found"<<endl;
     }
   }
 
+  int t;cin>>t;
 }

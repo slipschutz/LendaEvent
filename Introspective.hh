@@ -11,7 +11,7 @@
 #include "TObject.h"
 #include <map>
 #include <string>
-
+#include <utility> 
 #include "CorrectionInfo.hh"
 using namespace std;
 
@@ -40,7 +40,7 @@ public:
   void DumpResultVector();
 
   void PrintCorrection(string in);
-  map <string,CorrectionInfo> correctionsMap;
+  vector< pair<string,CorrectionInfo> > correctionsMap;
 
   void ApplyDynamicCorrections(); // MAgic function
   void Reset();
