@@ -65,7 +65,14 @@ void LendaEvent::setGainCorrections(Double_t in,Int_t channel){
 
   fnumOfGainCorrections++;
 }
+void LendaEvent::PrintList(){
+  DumpCorrectionsMap();
+  cout<<"The mapping between Corrections and names is"<<endl;
+  CorMap=mapForCorrectionResults;
+  for (map<string,int>::iterator ii =CorMap.begin();ii!=CorMap.end();ii++)
+    cout<<ii->first<<"  "<<ii->second<<endl;
 
+}
 
 void LendaEvent::Clear(){
   ////REMEBER TO CLEAR THINGS THAT were thing.push_Back!!!!
@@ -107,7 +114,7 @@ void LendaEvent::Clear(){
   shiftCorrectedTimes.clear();
 
   theDynamicCorrectionResults.clear();
-
+  Corrections.clear();
 
   NumOfChannelsInEvent=0;
 
@@ -256,7 +263,7 @@ void LendaEvent::Finalize(){
   ShiftDt=(shiftCorrectedTimes[0]-shiftCorrectedTimes[1]);
   ShiftTOF=0.5*(shiftCorrectedTimes[0]+shiftCorrectedTimes[1]) -shiftCorrectedTimes[2];
 
-  ShiftTOF=Dt;
+
   NumOfChannelsInEvent = times.size();//the number of channels pushed to event
   PulseShape = longGates[2]/shortGates[2];
 
@@ -270,9 +277,9 @@ void LendaEvent::Finalize(){
     walkCor();
 
   ApplyDynamicCorrections();
-
-
-  temp = theDynamicCorrectionResults[1];
+  
+  Corrections = theDynamicCorrectionResults;
+  CorMap=mapForCorrectionResults;
 
 
 }
@@ -315,7 +322,6 @@ void LendaEvent::posCor(){
       }
     }
   }
-
 
   Double_t runningTotal=0;
   for (int j=0;j<fnumOfPositionCorrections;j++){
@@ -449,8 +455,3 @@ void LendaEvent::MakeC(int spot){
   
 }
 
-void PrintCorrectionKeys(){
-
-
-
-}

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class LendaEvent :  public Introspective {
+class LendaEvent :  public Introspective  {
 public:
 
 
@@ -21,6 +21,7 @@ public:
   void Finalize(); //Applies intenral corrections and calculates convient Branches
 
   virtual void DefineMap();
+  void PrintList();
  
   //Convenient quantities calculated in Finalize
   Double_t TOF; // Time of flight //__var
@@ -36,6 +37,8 @@ public:
   vector <Double_t> TOFW; // the Walk corrections to TOF 
   vector <Double_t> TOFP; //The position Corrections to TOF
 
+  vector<Double_t> Corrections;
+  map <string,int> CorMap;
   //Main information holders
   vector <Double_t> energiesCor; //the corrected energies 
   vector <Double_t> times; //the times
@@ -108,7 +111,7 @@ public:
 
 
 
-  //Printing Methods
+
   void DumpWalkCorrections();
   void DumpGainCorrections();
   void DumpAllCorrections();

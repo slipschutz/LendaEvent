@@ -22,10 +22,7 @@ class Introspective : public TObject {
 public:
   Introspective();
   
-
-  void DumpMappedVariables();
-
-
+  Int_t correctionCount;
   //for adding a single entry to the table outside of 
   //deineMap method
   void AddMapEntry(std::string,void*);
@@ -37,6 +34,11 @@ public:
 
   void DefineCorrection(string time, string otherVar,vector<Double_t> coefs,Int_t channel);
   void DumpCorrectionsMap();
+  void DumpMappedVariables();
+  void DumpResultMap();
+  void DumpIntrospective();
+  void DumpResultVector();
+
   void PrintCorrection(string in);
   map <string,CorrectionInfo> correctionsMap;
 
@@ -44,13 +46,13 @@ public:
   void Reset();
   map <std::string,void*> theMap;
   vector <Double_t> theDynamicCorrectionResults;
-private:
+
 
   map <string,int> mapForCorrectionResults;
-
+private:
 
 public:
-  //  ClassDef(Introspective,1);
+
 };
 
 #endif
