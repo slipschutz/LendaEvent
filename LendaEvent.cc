@@ -21,12 +21,14 @@ LendaEvent::LendaEvent()
   fnumOfGainCorrections=0;
   fnumOfPositionCorrections=0;
   
-  CTrace=0;
+  /*  CTrace=0;
   CFilter=0;
   CCFD=0;
-
+  */
   Clear();
-  DefineMap();
+  //  DefineMap();
+
+ 
 }
 
 
@@ -66,12 +68,12 @@ void LendaEvent::setGainCorrections(Double_t in,Int_t channel){
   fnumOfGainCorrections++;
 }
 void LendaEvent::PrintList(){
-  DumpCorrectionsMap();
+  /*  DumpCorrectionsMap();
   cout<<"The mapping between Corrections and names is"<<endl;
   CorMap=mapForCorrectionResults;
   for (map<string,int>::iterator ii =CorMap.begin();ii!=CorMap.end();ii++)
     cout<<ii->first<<"  "<<ii->second<<endl;
-
+  */
 }
 
 void LendaEvent::Clear(){
@@ -113,7 +115,7 @@ void LendaEvent::Clear(){
 
   shiftCorrectedTimes.clear();
 
-  theDynamicCorrectionResults.clear();
+  // heDynamicCorrectionResults.clear();
   Corrections.clear();
 
   NumOfChannelsInEvent=0;
@@ -241,9 +243,8 @@ void LendaEvent::Finalize(){
   if (fgainCorrections.size()!=0)//only apply gain correctins if 
     gainCor();                   //they have be provided
 
-
+  /*
   if (Traces.size()!=0){
-    
     for (int j=0;j<Traces.size();j++){
       double avg =0;
       if (Traces[j].size()>20){
@@ -257,6 +258,12 @@ void LendaEvent::Finalize(){
       }
     }
   }
+  */
+
+  E0=energiesCor[0];
+  E1=energiesCor[1];
+  E2=energiesCor[2];
+  E3=energiesCor[3];
 
 
   TOF = 0.5*(times[0]+times[1])-times[2];
@@ -268,20 +275,21 @@ void LendaEvent::Finalize(){
   PulseShape = longGates[2]/shortGates[2];
 
   Dt = times[0]-times[1];
+  
+  CDt= cubicTimes[0]-cubicTimes[1];
 
   GOE = (energies[0]-energies[1])/(energies[0]+energies[1]);
   CorGOE = (energiesCor[0]-energiesCor[1])/(energiesCor[0]+energiesCor[1]);
-  posCor();  
+  //  posCor();  
 
-  if (fwalkCorrections.size()!=0)
-    walkCor();
+  //  if (fwalkCorrections.size()!=0)
+  //  walkCor();
 
-  ApplyDynamicCorrections();
+  /*  ApplyDynamicCorrections();
   
-  Corrections = theDynamicCorrectionResults;
-  CorMap=mapForCorrectionResults;
-
-
+  for (int i=0;i<correctionCount;i++)
+    Corrections.push_back( theDynamicCorrectionResults[i]);
+  */
 }
 
 void LendaEvent::setPositionCorrections(vector <Double_t> coef,Int_t channel ){
@@ -408,7 +416,7 @@ void LendaEvent::Fatal(){
 
 
 void LendaEvent::MakeC(int spot){
-  
+  /*  
   cout<<"this is CTrace "<<CTrace<<endl;
   
   if (CTrace != 0){
@@ -452,6 +460,34 @@ void LendaEvent::MakeC(int spot){
     if ( CCFD !=0 )
       CCFD[i]=CFDs[spot][i];
   }
-  
+  */
 }
+
+
+
+LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
+
+  this->Clear();
+
+  this->energiesCor = right.energiesCor;
+  this->times = right.times;
+  this->softTimes = right.softTimes;
+  this->cubicTimes = right.cubicTimes;
+  this->energies = right.energies;
+  this->internEnergies=right.energies;
+  this->channels = right.channels;
+  this->softwareCFDs =right.softwareCFDs;
+  this->internalCFDs =right.internalCFDs;
+  this->entryNums=right.entryNums;
+  this->Traces = right.Traces;
+  this->Filters = right.Filters;
+  this->CFDs = right.CFDs;
+  this->longGates =right.longGates;
+  this->shortGates =right.shortGates;
+
+  
+  return *this;
+
+}
+
 

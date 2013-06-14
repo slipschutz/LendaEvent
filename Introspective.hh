@@ -21,38 +21,38 @@ class Introspective : public TObject {
 
 public:
   Introspective();
-  
-  Int_t correctionCount;
-  //for adding a single entry to the table outside of 
-  //deineMap method
+  map <std::string,void*> theMap;
+  vector <CorrectionInfo> corrections;
+
   void AddMapEntry(std::string,void*);
 
   //Define pure virutal method for defining the table
   virtual void DefineMap()=0;//method defining the variables in the map should be auto-generated
-  
-  void * Get(std::string);
 
+  void * Get(std::string);
   void DefineCorrection(string time, string otherVar,vector<Double_t> coefs,Int_t channel);
+
+  Double_t theDynamicCorrectionResults[100];
+
+  map <string,int> mapForCorrectionResults;
+  vector <string> correctionKeys;
+  Int_t correctionCount;
+
+
   void DumpCorrectionsMap();
   void DumpMappedVariables();
   void DumpResultMap();
   void DumpIntrospective();
   void DumpResultVector();
 
-  void PrintCorrection(string in);
-  vector< pair<string,CorrectionInfo> > correctionsMap;
 
-  void ApplyDynamicCorrections(); // MAgic function
   void Reset();
-  map <std::string,void*> theMap;
-  vector <Double_t> theDynamicCorrectionResults;
+  void ApplyDynamicCorrections(); // MAgic function
 
 
-  map <string,int> mapForCorrectionResults;
-private:
 
 public:
-
+  ClassDef(Introspective,1);
 };
 
 #endif

@@ -4,6 +4,9 @@
 #pragma link off all functions;
 #pragma link C++ class vector< vector <Double_t> >+;
 #pragma link C++ class vector< vector <UShort_t> >+;
+#pragma link C++ class CorrectionInfo+;
+#pragma link C++ class std::vector<CorrectionInfo>+;
+#pragma link C++ class Introspective+;
 #pragma link C++ class LendaEvent+;
 #endif
 

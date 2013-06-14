@@ -23,12 +23,6 @@ public:
   Int_t channel;
   vector <Double_t> coefs;
 public:
-  //  ClassDef(CorrectionInfo,1);
+  ClassDef(CorrectionInfo,1);
 };
-
-
-
-
-
-
 #endif

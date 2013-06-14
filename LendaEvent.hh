@@ -29,6 +29,13 @@ public:
   Double_t ShiftTOF; //TOF after shift correction //__var
   Double_t ShiftDt;  //Dt after shift correction//__var
 
+  Double_t E0;//__var
+  Double_t E1;//__var
+  Double_t E2;//__var
+  Double_t E3;//__var
+
+  Double_t CDt;//__var
+
   Int_t NumBadPoints;//__var
 
   Double_t PulseShape; //long gate over short gate  //__var
@@ -67,11 +74,11 @@ public:
   //root like c arrays more then vectors of vectors
   void MakeC(int spot=0);  //copy trace,FF,CFD data for the spot-th trace into C-arrays
   //the c-array to store the trace in
-  Int_t fSize;//!
+  /*  Int_t fSize;//!
   UShort_t *CTrace;//[fSize] 
   Double_t* CFilter;//[fSize];
   Double_t* CCFD;//[fSize];
- 
+  */
 
 
   //pushing methods expects the series of times and energies to be ordered by channel
@@ -116,6 +123,10 @@ public:
   void DumpGainCorrections();
   void DumpAllCorrections();
   void DumpPositionCorrections(); 
+
+
+  
+  LendaEvent& operator = (const LendaEvent &right);
 
 
 

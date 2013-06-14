@@ -11,7 +11,7 @@ ROOTCINT=rootcint
 
 NAME=LendaEvent
 
-DICS=LendaEvent # Introspective #CorrectionInfo
+DICS=LendaEvent #Introspective CorrectionInfo
 
 temp= $(addprefix lib,$(NAME))
 temp2=$(addsuffix $(LDFLAGS),$(temp))
@@ -29,9 +29,9 @@ $(LIBRARY) : $(OBJECTS) $(EXTRAOBJS) $(DICTOBJ)
 	$(CXX) `root-config --cflags` -fPIC -shared -o $@ $^
 	@echo "Build succeed"
 
-%Dictionary.o : %.hh %LinkDef.h
+%Dictionary.o : %.hh Introspective.hh CorrectionInfo.hh %LinkDef.h
 	@echo "Generating Dictionary"
-	@$(ROOTCINT) -f $(patsubst %.o,%.cc,$@) -c $^;
+	$(ROOTCINT) -f $(patsubst %.o,%.cc,$@) -c $^;
 	@echo "Compiling Dicionary"
 	$(CXX) -p -fPIC $(CFLAGS) -c $(patsubst %.o,%.cc,$@)
 
