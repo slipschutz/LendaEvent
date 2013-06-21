@@ -11,7 +11,6 @@ using namespace std;
 #define BAD_NUM -1008
 LendaEvent::LendaEvent()
 {
- 
   fPosForm="chan";
   sdt1=0;
   sdt2=0;
@@ -21,14 +20,16 @@ LendaEvent::LendaEvent()
   fnumOfGainCorrections=0;
   fnumOfPositionCorrections=0;
   
-  /*  CTrace=0;
-  CFilter=0;
-  CCFD=0;
-  */
-  Clear();
-  //  DefineMap();
 
- 
+  Clear();
+
+
+}
+LendaEvent::LendaEvent(bool BuildMap){
+  LendaEvent();
+  if (BuildMap)
+    DefineMap();
+  
 }
 
 
@@ -74,6 +75,7 @@ void LendaEvent::PrintList(){
   for (map<string,int>::iterator ii =CorMap.begin();ii!=CorMap.end();ii++)
     cout<<ii->first<<"  "<<ii->second<<endl;
   */
+  AddMapEntry("energies",&energies);
 }
 
 void LendaEvent::Clear(){
@@ -284,12 +286,12 @@ void LendaEvent::Finalize(){
 
   //  if (fwalkCorrections.size()!=0)
   //  walkCor();
-
-  /*  ApplyDynamicCorrections();
   
+  ApplyDynamicCorrections();
+   
   for (int i=0;i<correctionCount;i++)
     Corrections.push_back( theDynamicCorrectionResults[i]);
-  */
+  
 }
 
 void LendaEvent::setPositionCorrections(vector <Double_t> coef,Int_t channel ){
@@ -491,3 +493,24 @@ LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
 }
 
 
+///////BEGIN __AUTO__ GENERATED///////
+void LendaEvent::DefineMap(){
+theVariableMap["TOF"]=&TOF;
+theVariableMap["Dt"]=&Dt;
+theVariableMap["ShiftTOF"]=&ShiftTOF;
+theVariableMap["ShiftDt"]=&ShiftDt;
+theVariableMap["E0"]=&E0;
+theVariableMap["E1"]=&E1;
+theVariableMap["E2"]=&E2;
+theVariableMap["E3"]=&E3;
+theVariableMap["CDt"]=&CDt;
+theVariableMap["NumBadPoints"]=&NumBadPoints;
+theVariableMap["PulseShape"]=&PulseShape;
+theVariableMap["GOE"]=&GOE;
+theVariableMap["CorGOE"]=&CorGOE;
+theVariableMap["energies"]=&energies;
+theVectorVariableMap["energies"]=&energies;
+theVariableMap["energiesCor"]=&energiesCor;
+theVectorVariableMap["energiesCor"]=&energiesCor;
+}
+ 

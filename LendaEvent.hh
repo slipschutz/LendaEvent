@@ -3,24 +3,22 @@
 
 #include "TObject.h"
 #include "TFile.h"
-#include "Introspective.hh"
+#include "Correctable.hh"
 #include <vector>
 #include <map>
 
 using namespace std;
 
-class LendaEvent :  public Introspective  {
+class LendaEvent :  public Correctable  {
 public:
 
-
-  
-  LendaEvent();
-
+  LendaEvent(); //Constructor 
+  LendaEvent(bool BuildMap);
   void Clear(); //Clear the Event.  Should be called after every write to a tree
 
-  void Finalize(); //Applies intenral corrections and calculates convient Branches
+  void Finalize(); //Applies internal corrections and calculates convient Branches
 
-  virtual void DefineMap();
+  virtual void DefineMap(); //Inherited from Correctable defins var look up
   void PrintList();
  
   //Convenient quantities calculated in Finalize

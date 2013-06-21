@@ -15,8 +15,8 @@ f=$(echo $1 | awk 'BEGIN{FS="."}{print $1}')
 s=$(echo $1 | awk 'BEGIN{FS="."}{print $2}')
 
 theCCfile=$f".cc";
-Dictionary=$f"Dict.cc";
-DictionaryHeader=$f"Dict.hh";
+Dictionary=$f"Parsed.cc";
+
 
 if [ ! -f $theCCfile ]; then
 echo "No .cc file found for "$1 "FATAL error"
@@ -24,7 +24,7 @@ exit
 fi
 
 echo "Making file "$Dictionary
-echo "With header "$DictionaryHeader
+
 
 
 ##check for dictionary present
@@ -40,7 +40,7 @@ $(cat $1 | awk '{if ($0 ~/__var/){print}}' >$tempFile )
 numOfLines=$(cat $tempFile | wc -l);
 
 if [ $numOfLines -eq -99 ]; then
-echo "No variables to make dictionary"
+#echo "No variables to make Parsed file"
 #if no variables to dictionarize just copy file to dictionary
 #$(cp $1 $DictionaryHeader);
 $(cp $theCCfile $Dictionary);
@@ -51,7 +51,7 @@ fi
 
 cat $theCCfile > $Dictionary;
 ##find name of class
-className=$(cat $1 | awk '{if ($0~/public Introspective/){print $2}}')
+className=$(cat $1 | awk '{if ($0~/public Correctable/){print $2}}')
 
 
 echo "///////BEGIN __AUTO__ GENERATED///////">>$Dictionary
@@ -67,7 +67,7 @@ temp=$(echo $line| awk ' BEGIN{FS=";"}{print $1}')
 type=$(echo $temp| awk '{print $1}')
 var=$(echo $temp| awk '{print $2}')
 
-echo "theMap[\"$var\"]=&$var;">>$Dictionary
+echo "theVariableMap[\"$var\"]=&$var;">>$Dictionary
 
 done
 echo "}">>$Dictionary
