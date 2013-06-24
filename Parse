@@ -61,12 +61,14 @@ echo "void $className::DefineMap(){">>$Dictionary
 ## begin loop over variables 
 
 for ((i=0;i<$numOfLines;i++)); do
-
-line=$(head -$((i+1)) $tempFile | tail -1)
-temp=$(echo $line| awk ' BEGIN{FS=";"}{print $1}')
-type=$(echo $temp| awk '{print $1}')
-var=$(echo $temp| awk '{print $2}')
-
+    line=$(head -$((i+1)) $tempFile | tail -1)
+    
+    bit=$(echo $line | awk ' { if($0 ~/\[/ ){print "1"} else {print "0"} } ')
+    echo $bit
+    temp=$(echo $line| awk ' BEGIN{FS=";"}{print $1}')
+    type=$(echo $temp| awk '{print $1}')
+    var=$(echo $temp| awk '{print $2}')
+    
 echo "theVariableMap[\"$var\"]=&$var;">>$Dictionary
 
 done

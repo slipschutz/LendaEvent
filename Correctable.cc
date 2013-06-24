@@ -16,7 +16,7 @@ using namespace std;
 
 Correctable::Correctable(){
   correctionCount=0;
-  //  Reset();
+  
 }
 
 
