@@ -15,21 +15,48 @@ using namespace std;
 
 
 Correctable::Correctable(){
+  //Constructor
   correctionCount=0;
-  
+  Corrections={0};
+
+}
+Correctable::~Correctable(){
+
+
 }
 
-
-void Correctable::AddMapEntry(string s,void* p,bool isArray){
+void Correctable::AddMapEntry(string s,void* p){
+  //Adds a single entry to th map of Variables 
+  //
   if ( theVariableMap.find(s) == theVariableMap.end() ){ //not in there already
     theVariableMap[s] = p;
   } else {
-    cout<<"***Warning entry "<<s<<" already in theVariableMap***"<<endl;
+    cout<<"***Warning entry "<<s<<" already in the Variable Map***"<<endl;
   }
+  
+}
+
+void Correctable::AddMapEntry(string s,vector <Double_t>* p){
+  //Adds a single entry to th map of vectors
+  //
+  string parsedName;
+  int index; 
+  ParseVectorInput(s,parsedName,index);
+  void* temp =(void*)p;
+
+  AddMapEntry(parsedName,temp);//Add it to the variable map
+  if ( theVectorVariableMap.find(parsedName) == theVectorVariableMap.end()){ //not in there already
+    theVectorVariableMap[parsedName] = p;
+  } else {
+    cout<<"***Warning entry "<<s<<" already in the Vector Variable Map***"<<endl;
+  }
+  
 }
 
 void* Correctable::Get(string s){
-
+  //the get methods for simple types.  Needs to be cast to 
+  //the appropriate type when called
+  //
   if (theVariableMap.find(s) != theVariableMap.end() ){
     
     return theVariableMap[s];
@@ -41,6 +68,8 @@ void* Correctable::Get(string s){
   
 }
 vector<Double_t>* Correctable::GetVector(string s){
+  //The get methods for Vectors.  Vectors must be of type Double_t
+  //
   if(theVectorVariableMap.find(s) != theVectorVariableMap.end() ){
     return theVectorVariableMap[s];
   }else {
@@ -51,6 +80,8 @@ vector<Double_t>* Correctable::GetVector(string s){
 
 
 void Correctable::ParseVectorInput(string in,string &out,int &index){
+  //Method takes string "in" of form array[index] and sets "out" to array
+  //and sets "index" to index
 
   vector <string> elems;
   stringstream ss(in);
@@ -107,7 +138,7 @@ void Correctable::DefineCorrection(string time, string otherVar,vector<Double_t>
   mapForCorrectionResults[s.str()]=correctionCount;
   correctionCount++;
   //    theDynamicCorrectionResults.resize(correctionCount,-1);
-  AddMapEntry(s.str(),&theDynamicCorrectionResults[correctionCount-1]);
+  AddMapEntry(s.str(),&Corrections[correctionCount-1]);
   //theDynamicCorrectionResults[correctionCount -1] gets set to something when corrections are applied
   //in Appply dynamic Corrections
 
@@ -124,14 +155,18 @@ void Correctable::DumpMappedVariables(){
 
   cout<<"****Dump Mapped Variables****"<<endl<<endl;
   for (map<string,void*>::iterator ii=theVariableMap.begin();ii!=theVariableMap.end();ii++){
-    
+    cout<<ii->first<<endl;
+  }
+
+  cout<<"****Dump Mapped Vector Variables****"<<endl<<endl;
+  for (map<string,vector<Double_t>* >::iterator ii=theVectorVariableMap.begin();ii!=theVectorVariableMap.end();ii++){
     cout<<ii->first<<endl;
   }
 }
 void Correctable::DumpResultVector(){
   cout<<"****Dump Result Vector****"<<endl;
   for (int i=0;i<correctionCount;i++){
-    cout<<"Corrected value at "<<i<<" is "<<theDynamicCorrectionResults[i]<<endl;
+    cout<<"Corrected value at "<<i<<" is "<<Corrections[i]<<endl;
 
   }
 
@@ -143,7 +178,7 @@ void Correctable::DumpCorrectionsMap(){
   
   cout<<"\n****Dumping Dynamically defined corrections****\n"<<endl;
   for (int i=0;i<corrections.size();i++){
-    if (Get(correctionKeys[i]) != NULL && Get(correctionKeys[i])!=NULL){
+    if (Get(correctionKeys[i]) != NULL){
       cout<<"Correction for variables "<<correctionKeys[i]<<" For Channel "<<corrections[i].channel<<endl;
       
       int size = corrections[i].coefs.size();
@@ -210,7 +245,7 @@ void Correctable::ApplyDynamicCorrections(){
       }
       //put the result in result vector.  The mappig to this value was created 
       //in define correction when the correction was defined 
-      theDynamicCorrectionResults[spot]=(*theInfo.time-tempTotal);
+      Corrections[spot]=(*theInfo.time-tempTotal);
     } else {
       cout<<"*** Warning the correction "<<theName<<" not found"<<endl;
     }

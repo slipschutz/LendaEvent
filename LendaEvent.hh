@@ -42,7 +42,7 @@ public:
   vector <Double_t> TOFW; // the Walk corrections to TOF 
   vector <Double_t> TOFP; //The position Corrections to TOF
 
-  vector<Double_t> Corrections;
+  //  vector<Double_t> Corrections;
   map <string,int> CorMap;
   //Main information holders
   vector <Double_t> energiesCor; //the corrected energies 
@@ -72,11 +72,7 @@ public:
   //root like c arrays more then vectors of vectors
   void MakeC(int spot=0);  //copy trace,FF,CFD data for the spot-th trace into C-arrays
   //the c-array to store the trace in
-  /*  Int_t fSize;//!
-  UShort_t *CTrace;//[fSize] 
-  Double_t* CFilter;//[fSize];
-  Double_t* CCFD;//[fSize];
-  */
+
 
 
   //pushing methods expects the series of times and energies to be ordered by channel

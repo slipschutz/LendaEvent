@@ -118,7 +118,7 @@ void LendaEvent::Clear(){
   shiftCorrectedTimes.clear();
 
   // heDynamicCorrectionResults.clear();
-  Corrections.clear();
+
 
   NumOfChannelsInEvent=0;
 
@@ -288,10 +288,7 @@ void LendaEvent::Finalize(){
   //  walkCor();
   
   ApplyDynamicCorrections();
-   
-  for (int i=0;i<correctionCount;i++)
-    Corrections.push_back( theDynamicCorrectionResults[i]);
-  
+
 }
 
 void LendaEvent::setPositionCorrections(vector <Double_t> coef,Int_t channel ){

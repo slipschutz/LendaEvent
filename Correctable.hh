@@ -21,13 +21,23 @@ using namespace std;
 class Correctable : public TObject { 
 public:
   Correctable(); //Constructor 
+  virtual ~Correctable();// de-constructor
+
+
+  //Hide somethings from the interpreter 
+#ifndef __CINT__ 
   map <std::string,void*> theVariableMap; //map for variables (only for simples types)
   map <std::string,vector<Double_t>* > theVectorVariableMap; //map for vectors all Double_t's
-
   vector <CorrectionInfo> corrections; //Vector holding the correction info for each correction
+  Int_t correctionCount; //how many corrections have been defined
+  map <string,int> mapForCorrectionResults;//map to where each correction is in the Results vector
+  vector <string> correctionKeys; //vector holding the correction names in the order they were defined
+#endif
 
-  void AddMapEntry(std::string,void*,bool isArray=false);//method to add entry to variableMap
 
+
+  void AddMapEntry(std::string,void*);//method to add entry to variableMap
+  void AddMapEntry(std::string,vector <Double_t>*);//method to add entry to vector Variable Map
   //Define pure virutal method for defining the Maps
   virtual void DefineMap()=0;//method defining the variables in the map can be auto-generated
 
@@ -37,18 +47,15 @@ public:
   //Define a correction.  
   void DefineCorrection(string time, string otherVar,vector<Double_t> coefs,Int_t channel);
 
-  Double_t theDynamicCorrectionResults[100];
-
-  map <string,int> mapForCorrectionResults;//map to where each correction is in the Results vector
-  vector <string> correctionKeys; //vector holding the correction names in the order they were defined
-  Int_t correctionCount; //how many corrections have been defined
+  
+  Double_t Corrections[100];//the array holding the dynamical defined correction results
 
   //Methods for printing info containted in this class
   void DumpCorrectable(); //Dumps everything
-  void DumpCorrectionsMap();
-  void DumpMappedVariables();
-  void DumpResultMap();
-  void DumpResultVector();
+  void DumpCorrectionsMap();//Dumps the Dynamicaly defined corrections
+  void DumpMappedVariables();//Dumps the map of variables
+  void DumpResultMap(); // Dump the map of where correcions are in the corrections array
+  void DumpResultVector(); //dumps the Conents of the Corrections array
 
 
   void Reset();
