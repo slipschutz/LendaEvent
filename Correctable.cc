@@ -131,7 +131,7 @@ void Correctable::DefineCorrection(string time, string otherVar,vector<Double_t>
   i.coefs = coefs;
   i.channel =channel;
   stringstream s;
-  s<<time<<"_"<<otherVar<<"ch_"<<channel;
+  s<<time<<"_"<<otherVar<<"ch"<<channel;
   
   corrections.push_back(i);
   correctionKeys.push_back(s.str());

@@ -66,7 +66,7 @@ public:
   vector <Double_t> shortGates;  //short gate energies
   vector <Double_t> longGates;  //long gate energies
 
-  Double_t temp;
+
 
   //C Trace thing
   //root like c arrays more then vectors of vectors
