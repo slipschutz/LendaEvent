@@ -16,9 +16,9 @@ public:
   LendaEvent(bool BuildMap);
   void Clear(); //Clear the Event.  Should be called after every write to a tree
 
-  void Finalize(); //Applies internal corrections and calculates convient Branches
+  void Finalize(); //Applies internal corrections and calculates convient Branches/leaves
 
-  virtual void DefineMap(); //Inherited from Correctable defins var look up
+  virtual void DefineMap(); //Inherited from Correctable defines var look up
   void PrintList();
  
   //Convenient quantities calculated in Finalize
@@ -57,7 +57,7 @@ public:
   vector <Long64_t> entryNums;
 
   vector < vector <UShort_t> > Traces; // a vector of vectors holding the traces if present
-  vector < vector <Double_t> > Filters; //a vector of vectors for the filters if presetn
+  vector < vector <Double_t> > Filters; //a vector of vectors for the filters if present
   vector < vector <Double_t> > CFDs;  // a vector of vectors for the CFDs if present
   
   
@@ -95,8 +95,8 @@ public:
 
   //Corrections setting methods
   inline void setShiftCorrections(Double_t c1,Double_t c2){sdt1=c1;sdt2=c2;}//set shift Cor
-  void setGainCorrections(Double_t in,Int_t channel);//sets the gain correction for a channel
-  void setGainCorrections(vector <Double_t> );//wrapper to the above assumes the vector has channel 0 at 
+  void setGainCorrections(Double_t slope,Double_t c,Int_t channel);//sets the gain correction for a channel
+  void setGainCorrections(vector <pair <Double_t,Double_t> > );//wrapper to the above assumes the vector has channel 0 at 
                                               //index 0 and channel 1 at index 1 ...
 
 
@@ -135,7 +135,7 @@ private:
   //Corecction 
   Double_t sdt1,sdt2;
 
-  vector <Double_t> fgainCorrections; //the gain corrections 
+  vector < pair<Double_t,Double_t> > fgainCorrections; //the gain corrections 
   vector < vector <Double_t> > fwalkCorrections; // set of walkCorrections
 
   map <string,vector<Double_t> > fPositionCorrections;//map for the position corrections 
@@ -149,7 +149,7 @@ private:
   double fTimeAfterPosCor; //the time after the pos cor which the walk cor is applied to
   
 public:
-  ClassDef(LendaEvent, 11);
+  ClassDef(LendaEvent, 12);
 };
 
 #endif

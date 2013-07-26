@@ -52,18 +52,18 @@ void LendaEvent::setWalkCorrections(vector <Double_t> in,Int_t channel){
   fnumOfWalkCorrections++;
 }
 
-void LendaEvent::setGainCorrections(vector <Double_t> in ){
+void LendaEvent::setGainCorrections(vector <pair <Double_t,Double_t> > in ){
   for (int i=0;i<(int)in.size();i++)
-    setGainCorrections(in[i],i);
+    setGainCorrections(in[i].first,in[i].second,i);
 }
 
-void LendaEvent::setGainCorrections(Double_t in,Int_t channel){
+void LendaEvent::setGainCorrections(Double_t slope,Double_t c,Int_t channel){
 
   if (channel >= (Int_t)fgainCorrections.size()){
     int diff = channel - fgainCorrections.size();
-    fgainCorrections.resize(fgainCorrections.size()+diff+1,1.0);
+    fgainCorrections.resize(fgainCorrections.size()+diff+1,make_pair(1.0,0));
   }
-  fgainCorrections[channel]=in;
+  fgainCorrections[channel]=make_pair(slope,c);
 
 
   fnumOfGainCorrections++;
@@ -200,7 +200,8 @@ void LendaEvent::gainCor(){
   //Applying gain correction to each of the channels for Lenda bars
   
   for (int i=0;i<(int)energies.size();i++){
-    energiesCor[i]=energies[i]*fgainCorrections[channels[i]];
+    energiesCor[i]=energies[i]*fgainCorrections[channels[i]].first +
+      fgainCorrections[channels[i]].second;
 
   }
 }
@@ -387,7 +388,8 @@ void LendaEvent::DumpWalkCorrections(){
 void LendaEvent::DumpGainCorrections(){
   cout<<"\n***Dump gain Corrections***"<<endl;
   for (int i=0;i<(int)fgainCorrections.size();++i){
-    cout<<"gain correction for channel "<<i<<" "<<fgainCorrections[i]<<endl;
+    cout<<"gain correction for channel "<<i<<" "<<fgainCorrections[i].first<<" "
+	<<fgainCorrections[i].second<<endl;
   }
 }
 
