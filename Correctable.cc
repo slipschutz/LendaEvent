@@ -17,7 +17,7 @@ using namespace std;
 Correctable::Correctable(){
   //Constructor
   correctionCount=0;
-  Corrections={0};
+  //  Corrections={0};
 
 }
 Correctable::~Correctable(){
@@ -143,6 +143,48 @@ void Correctable::DefineCorrection(string time, string otherVar,vector<Double_t>
   //in Appply dynamic Corrections
 
 }
+void Correctable::DefineCorrection(string time, string otherVar,TF1 * func,Int_t channel){
+
+  string temp; int index;
+  ParseVectorInput(otherVar,temp,index);// void ParseVectorInput(string in,string & out,int &index);
+
+  CorrectionInfo i;
+  if (temp != otherVar){
+    //it was an array/vector 
+    //check that the base name was mapped
+    if ( Get(time)!=NULL &&Get(temp)!=NULL){
+      i.time = (Double_t*)Get(time);
+      i.correctingVarVec = GetVector(temp);
+      cout<<"address is "<<i.correctingVarVec<<endl;
+      i.isArray=true;
+      i.index=index;
+    }
+  }else {
+    //it was not an array input 
+    if (Get(time)!=NULL && Get(otherVar)!=NULL){
+      i.time = (Double_t*)Get(time);
+      i.correctingVar = (Double_t*)Get(otherVar);
+    }
+  }
+
+  i.firstName = time;
+  i.secondName = otherVar; 
+  i.theFunction = func;
+  i.isTF1=true;
+  i.channel =channel;
+  stringstream s;
+  s<<time<<"_"<<otherVar<<"ch"<<channel;
+  
+  corrections.push_back(i);
+  correctionKeys.push_back(s.str());
+  mapForCorrectionResults[s.str()]=correctionCount;
+  correctionCount++;
+  //    theDynamicCorrectionResults.resize(correctionCount,-1);
+  AddMapEntry(s.str(),&Corrections[correctionCount-1]);
+  //theDynamicCorrectionResults[correctionCount -1] gets set to something when corrections are applied
+  //in Appply dynamic Corrections
+  
+}
 
 
 void Correctable::Reset(){
@@ -226,7 +268,7 @@ void Correctable::ApplyDynamicCorrections(){
       //Calculate the correction;
       int degree = theInfo.coefs.size();
       Double_t tempTotal=0;
-      Double_t theValue;
+      Double_t theValue=0;
       //if it is a correction to with respect to a simle variable just get corVar from info
       if (!theInfo.isArray) 
 	theValue=*theInfo.correctingVar; 
@@ -234,14 +276,18 @@ void Correctable::ApplyDynamicCorrections(){
 	vector <Double_t> v =*(theInfo.correctingVarVec);
 	if(v.size()<=theInfo.index){ // if the size of the vector is less then the num in
 	  // vector[num] that was given when correcton was defined throw a warning
-	  cout<<"***Warning attempting to apply correction with "<<theInfo.secondName<<" which is undecleared***"<<endl;
+	  cout<<"***Warning attempting to apply correction with "<<theInfo.secondName<<" which is undecleared.  Size is "<<v.size()<<" ***"<<endl;
 	}else{ // else set the value to the coresponding spot in the vector
 	  theValue=v[theInfo.index];
 	}
       }
       //total up the correction
-      for (int i=0;i<degree;i++){
-	tempTotal=tempTotal+theInfo.coefs[i]*(TMath::Power(theValue,i+1));
+      if (!theInfo.isTF1){ // if was given as a vector of coefs total it up
+	for (int i=0;i<degree;i++){
+	  tempTotal=tempTotal+theInfo.coefs[i]*(TMath::Power(theValue,i+1));
+	}
+      } else { //if it was given as a TF1 then call it to get the value
+	tempTotal=(*theInfo.theFunction)(theValue);
       }
       //put the result in result vector.  The mappig to this value was created 
       //in define correction when the correction was defined 

@@ -4,13 +4,14 @@
 // in the child classes.
 //
 // With this map the class provides dynamically defined corrections between variables in the map
-// The results of these corrections are put into the array theDynamicCorrectionResults
+// The results of these corrections are put into the array Corrections
 */
 
 #ifndef __CORRECTABLE_HH
 #define __CORRECTABLE_HH
 
 #include "TObject.h"
+#include "TF1.h"
 #include <map>
 #include <string>
 #include <utility> 
@@ -45,7 +46,9 @@ public:
   vector<Double_t>* GetVector(string); //get vector from vector map
   
   //Define a correction.  
-  void DefineCorrection(string time, string otherVar,vector<Double_t> coefs,Int_t channel);
+  void DefineCorrection(string time, string otherVar,vector<Double_t> coefs,Int_t channel);//for polynomial corrections
+  void DefineCorrection(string time, string otherVar,TF1 * func,Int_t channel);//arbitrary TF1
+
 
   
   Double_t Corrections[100];//the array holding the dynamical defined correction results

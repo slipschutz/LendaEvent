@@ -269,7 +269,10 @@ void LendaEvent::Finalize(){
   E3=energiesCor[3];
 
 
-  TOF = 0.5*(times[0]+times[1])-times[2];
+  if (cubicTimes.size()==4)
+    TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
+  else 
+    TOF=BAD_NUM;
   ShiftDt=(shiftCorrectedTimes[0]-shiftCorrectedTimes[1]);
   ShiftTOF=0.5*(shiftCorrectedTimes[0]+shiftCorrectedTimes[1]) -shiftCorrectedTimes[2];
 
