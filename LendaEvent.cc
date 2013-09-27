@@ -1,4 +1,4 @@
-
+ 
 
 #include "LendaEvent.hh"
 #include <iostream>
@@ -84,6 +84,7 @@ void LendaEvent::Clear(){
   Dt=BAD_NUM;
   
   NumBadPoints=0;
+  ErrorBit=0;
 
   ShiftDt=BAD_NUM;
   ShiftTOF=BAD_NUM;
@@ -290,6 +291,14 @@ void LendaEvent::Finalize(){
 
   //  if (fwalkCorrections.size()!=0)
   //  walkCor();
+  for (int i=0;i<energies.size();i++){
+    if (energies[i]<0 || softwareCFDs[i]<0 ){
+      ErrorBit=true;
+      break;
+    }
+
+  }
+
   
   ApplyDynamicCorrections();
 

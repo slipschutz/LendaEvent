@@ -27,6 +27,8 @@ public:
   Double_t ShiftTOF; //TOF after shift correction //__var
   Double_t ShiftDt;  //Dt after shift correction//__var
 
+  Bool_t ErrorBit;
+
   Double_t E0;//__var
   Double_t E1;//__var
   Double_t E2;//__var
