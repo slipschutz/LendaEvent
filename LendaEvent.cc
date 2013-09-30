@@ -11,14 +11,11 @@ using namespace std;
 #define BAD_NUM -1008
 LendaEvent::LendaEvent()
 {
-  fPosForm="chan";
-  sdt1=0;
-  sdt2=0;
+
   fgainCorrections.clear();
-  fwalkCorrections.clear();
-  fnumOfWalkCorrections=0;
+
   fnumOfGainCorrections=0;
-  fnumOfPositionCorrections=0;
+
   
 
   Clear();
@@ -33,24 +30,6 @@ LendaEvent::LendaEvent(bool BuildMap){
 }
 
 
-void LendaEvent::setWalkCorrections(vector <Double_t> in){
-  fwalkCorrections.clear();
-  fwalkCorrections.push_back(in);
-  fnumOfWalkCorrections=0;
-}
-
-void LendaEvent::setWalkCorrections(vector <Double_t> in,Int_t channel){
-
-  if (channel >= (Int_t)fwalkCorrections.size() ){
-    int diff = channel-fwalkCorrections.size();
-    fwalkCorrections.resize( fwalkCorrections.size()+diff +1);
-  }
-  
-  fwalkCorrections[channel]=in;
-
-
-  fnumOfWalkCorrections++;
-}
 
 void LendaEvent::setGainCorrections(vector <pair <Double_t,Double_t> > in ){
   for (int i=0;i<(int)in.size();i++)
@@ -86,16 +65,11 @@ void LendaEvent::Clear(){
   NumBadPoints=0;
   ErrorBit=0;
 
-  ShiftDt=BAD_NUM;
-  ShiftTOF=BAD_NUM;
-
+  
   GOE=BAD_NUM;
   CorGOE=BAD_NUM;
   PulseShape=BAD_NUM;
-
-  TOFW.clear();
-  TOFP.clear();
-
+  
   times.clear();
   energies.clear();
   energiesCor.clear();
@@ -115,9 +89,7 @@ void LendaEvent::Clear(){
   shortGates.clear();
   longGates.clear();
 
-
-  shiftCorrectedTimes.clear();
-
+  
   // heDynamicCorrectionResults.clear();
 
 
@@ -175,26 +147,6 @@ void LendaEvent::pushInternEnergy(Double_t t){
   internEnergies.push_back(t);
 }
 
-void LendaEvent::shiftCor(){
-
-  // correction to move the time difference spectrum seen in a lenda bar
-  // to be around 0
-  //correction determined from time[0]-time[1]
-  //shift applied to time[0]
-  if (channels[0]==0 && channels[1] ==1 ) {//one bar
-    shiftCorrectedTimes.push_back(times[0]-sdt1);
-
-
-  } else if (channels[0]==2 && channels[1]==3) { //the other one
-    shiftCorrectedTimes.push_back(times[0]-sdt2);
-
-
-  }
-
-  shiftCorrectedTimes.push_back(times[1]); //time[1] is unchanged
-  shiftCorrectedTimes.push_back(times[2]);//time[2] is unchanged
-
-}
 
 void LendaEvent::gainCor(){
 
@@ -207,42 +159,10 @@ void LendaEvent::gainCor(){
   }
 }
 
-void LendaEvent::walkCor(){
-  Double_t total[fnumOfWalkCorrections];
-
-  for (int i=0;i<fnumOfWalkCorrections;i++)
-    total[i]=0;
-
-  
-  for (int j=0;j<fnumOfWalkCorrections;j++){
-    if (channels[j]<fwalkCorrections.size()){
-      for (int i=0;i<(int)fwalkCorrections[channels[j]].size();i++){
-	
-	//	if (energiesCor[j]<600)
-	  total[j]=total[j]+fwalkCorrections[channels[j]][i]*TMath::Power(energiesCor[j],i+1);
-
-      }
-    }
-  }
-
-
-  Double_t runningTotal=0;
-  for (int j=0;j<fnumOfWalkCorrections;j++){
-     runningTotal = runningTotal +total[j];
-     //     cout<<"This is runningTotal "<<runningTotal<<" this is J "<<j<<endl;
-     // int t ;cin>>t;
-     TOFW[j]=fTimeAfterPosCor-runningTotal;
-  }
-    
-}
-
-
 void LendaEvent::Finalize(){
 
   energiesCor.resize(energies.size());
-  TOFW.resize(fnumOfWalkCorrections);
-  TOFP.resize(fnumOfPositionCorrections);
-  shiftCor();//make the shiftCorrectedTimes
+
  
   if (fgainCorrections.size()!=0)//only apply gain correctins if 
     gainCor();                   //they have be provided
@@ -274,8 +194,6 @@ void LendaEvent::Finalize(){
     TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
   else 
     TOF=BAD_NUM;
-  ShiftDt=(shiftCorrectedTimes[0]-shiftCorrectedTimes[1]);
-  ShiftTOF=0.5*(shiftCorrectedTimes[0]+shiftCorrectedTimes[1]) -shiftCorrectedTimes[2];
 
 
   NumOfChannelsInEvent = times.size();//the number of channels pushed to event
@@ -304,98 +222,6 @@ void LendaEvent::Finalize(){
 
 }
 
-void LendaEvent::setPositionCorrections(vector <Double_t> coef,Int_t channel ){
-
-  stringstream key;
-  key<<fPosForm<<"_"<<channel;
-
-  if (fPositionCorrections.find(key.str()) == fPositionCorrections.end()){
-    fPositionCorrections[key.str()]=coef;
-    fnumOfPositionCorrections++;
-  }else {
-    cout<<"***Warning correction with key "<<key.str()<<" has already exists***"<<endl;
-    cout<<"***Choose different key***"<<endl;
-  }
-}
-
-void LendaEvent::posCor(){
-  //Apply the position correctioins
-
-  
-
-  Double_t total[fnumOfPositionCorrections];
-
-  for (int i=0;i<fnumOfPositionCorrections;i++)
-    total[i]=0;
-
-  stringstream key;
-  vector <Double_t> theCoef;
-  for (int j=0;j<fnumOfPositionCorrections;j++){
-    key.str("");
-    key<<fPosForm<<"_"<<channels[j];
-    if (fPositionCorrections.find(key.str()) != fPositionCorrections.end()){
-      theCoef =fPositionCorrections[key.str()];
-      for (int i=0;i<theCoef.size();++i){
-	total[j]=total[j]+ theCoef[i]*TMath::Power(CorGOE,i+1);
-
-
-      }
-    }
-  }
-
-  Double_t runningTotal=0;
-  for (int j=0;j<fnumOfPositionCorrections;j++){
-    runningTotal=runningTotal+total[j];
-    TOFP[j]=ShiftTOF-runningTotal;    
-
-  }
-
-
-  if (TOFP.size()!=0)
-    fTimeAfterPosCor=TOFP[TOFP.size()-1];
-  else
-    fTimeAfterPosCor=ShiftTOF;
-
-  /*
-    if (channels[j]<fwalkCorrections.size()){
-      for (int i=0;i<(int)fwalkCorrections[channels[j]].size();i++){
-
-        //      if (energiesCor[j]<600)
-	total[j]=total[j]+fwalkCorrections[channels[j]][i]*TMath::Power(energiesCor[j],i+1);
-
-      }
-    }
-  }
-
-  Double_t runningTotal=0;
-  for (int j=0;j<fnumOfWalkCorrections;j++){
-    runningTotal = runningTotal +total[j];
-    //     cout<<"This is runningTotal "<<runningTotal<<" this is J "<<j<<endl;
-    // int t ;cin>>t;
-    TOFW[j]=ShiftTOF-runningTotal;
-  }
-
-
-  */
-
-
-}
-
-
-void LendaEvent::DumpWalkCorrections(){
-  cout<<"\n***Dump walk corrections***"<<endl;
-
-  for (int j=0;j<(int)fwalkCorrections.size();++j){
-    int max_i = fwalkCorrections[j].size();
-    cout<<"walkCorrection for channel "<<j<<endl;
-    for (int i=0;i<max_i;++i){
-      cout<<"   c"<<i+1<<" "<<fwalkCorrections[j][i]<<endl;
-      //i+1 because the coefficents don't include the constant term
-    }
-  }
-  
-
-}
 
 void LendaEvent::DumpGainCorrections(){
   cout<<"\n***Dump gain Corrections***"<<endl;
@@ -407,21 +233,8 @@ void LendaEvent::DumpGainCorrections(){
 
 void LendaEvent::DumpAllCorrections(){
   DumpGainCorrections();
-  DumpWalkCorrections();
-  DumpPositionCorrections();
 }
 
-
-void LendaEvent:: DumpPositionCorrections(){
-  
-for( map<string,vector<double> >::iterator ii=fPositionCorrections.begin(); ii!=fPositionCorrections.end(); ++ii)
-    {
-      for (int i=0;i<(int)((*ii).second).size();++i)
-	cout << (*ii).first<<" "<<i << ": " << (*ii).second[i] << endl;
-    }
-
-
-}
 
 void LendaEvent::Fatal(){
   cout<<"This Method should not exist.  Don't call it"<<endl;
@@ -508,8 +321,6 @@ LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
 void LendaEvent::DefineMap(){
 theVariableMap["TOF"]=&TOF;
 theVariableMap["Dt"]=&Dt;
-theVariableMap["ShiftTOF"]=&ShiftTOF;
-theVariableMap["ShiftDt"]=&ShiftDt;
 theVariableMap["E0"]=&E0;
 theVariableMap["E1"]=&E1;
 theVariableMap["E2"]=&E2;
