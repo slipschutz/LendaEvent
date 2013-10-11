@@ -139,7 +139,9 @@ void LendaEvent::pushEntryNum(Long64_t t){
 void LendaEvent::pushCubicTime(Double_t t){
   cubicTimes.push_back(t);
 }
-
+void LendaEvent::pushCubicCFD(Double_t t){
+  cubicTimes.push_back(t);
+}
 
 void LendaEvent::pushLongGate(Double_t lg){
   longGates.push_back(lg);

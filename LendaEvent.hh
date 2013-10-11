@@ -91,6 +91,7 @@ public:
   void pushSoftTime(Double_t);
   void pushEntryNum(Long64_t);
   void pushCubicTime(Double_t);
+  void pushCubicCFD(Double_t);
 
   Int_t NumOfChannelsInEvent; //The Number of channels associated with this event
 
