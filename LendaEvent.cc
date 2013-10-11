@@ -15,8 +15,8 @@ LendaEvent::LendaEvent()
   fgainCorrections.clear();
 
   fnumOfGainCorrections=0;
-
   
+  GammaPeakTime=4.08274;
 
   Clear();
 
@@ -61,7 +61,9 @@ void LendaEvent::Clear(){
   ////REMEBER TO CLEAR THINGS THAT were thing.push_Back!!!!
   TOF=BAD_NUM;
   Dt=BAD_NUM;
-  
+  TOFEnergy=BAD_NUM;
+  ShiftTOF=BAD_NUM;
+
   NumBadPoints=0;
   ErrorBit=0;
 
@@ -79,6 +81,8 @@ void LendaEvent::Clear(){
   internalCFDs.clear();
   softTimes.clear();
   cubicTimes.clear();
+  cubicCFDs.clear();
+
 
   Traces.clear();
   Filters.clear();
@@ -218,7 +222,24 @@ void LendaEvent::Finalize(){
   }
 
   
-  ApplyDynamicCorrections();
+    
+  if ( NumOfChannelsInEvent==3){
+    Double_t c= 2.99 * TMath::Power(10,8);
+    Double_t shift=(GammaPeakTime-0.334448);
+    
+    Double_t shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
+    ShiftTOF=shiftTime;
+    
+    shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
+    
+    Double_t beta = (1.0/c)*(1.0/shiftTime);
+    Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
+    Double_t KE = (gamma-1.0)*939.5650; // MEV
+    TOFEnergy=KE;
+
+
+  }
+  //ApplyDynamicCorrections();
 
 }
 

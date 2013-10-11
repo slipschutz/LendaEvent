@@ -24,8 +24,8 @@ public:
   //Convenient quantities calculated in Finalize
   Double_t TOF; // Time of flight //__var
   Double_t Dt; //Diference between Top and botom PMTs //__var
-
-
+  Double_t ShiftTOF;
+  Double_t TOFEnergy;
 
   Bool_t ErrorBit;
 
@@ -42,6 +42,7 @@ public:
   Double_t GOE;   //Center of Gravity (E1-E2)/(E1+E2)  //__var
   Double_t CorGOE;//Center of Gravity after gain matching //__var
 
+  Double_t GammaPeakTime;
 
   //  vector<Double_t> Corrections;
   map <string,int> CorMap;
@@ -54,6 +55,7 @@ public:
   vector <Double_t> internEnergies;
   vector <Double_t> channels; // the channels
   vector <Double_t> softwareCFDs;
+  vector <Double_t> cubicCFDs;
   vector <Double_t> internalCFDs;
   vector <Long64_t> entryNums;
 
@@ -98,7 +100,7 @@ public:
   void setGainCorrections(Double_t slope,Double_t c,Int_t channel);//sets the gain correction for a channel
   void setGainCorrections(vector <pair <Double_t,Double_t> > );//wrapper to the above assumes the vector has channel 0 at 
                                               //index 0 and channel 1 at index 1 ...
-
+  inline void SetGammaPeakTime(Double_t t){GammaPeakTime=t;}
   void DumpGainCorrections();
   void DumpAllCorrections();
 
@@ -124,7 +126,7 @@ private:
 
   
 public:
-  ClassDef(LendaEvent, 13);
+  ClassDef(LendaEvent, 14);
 };
 
 #endif
