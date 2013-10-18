@@ -62,6 +62,7 @@ void LendaEvent::Clear(){
   TOF=BAD_NUM;
   Dt=BAD_NUM;
   TOFEnergy=BAD_NUM;
+  TOFEnergyInternal=BAD_NUM;
   ShiftTOF=BAD_NUM;
 
   NumBadPoints=0;
@@ -140,7 +141,7 @@ void LendaEvent::pushCubicTime(Double_t t){
   cubicTimes.push_back(t);
 }
 void LendaEvent::pushCubicCFD(Double_t t){
-  cubicTimes.push_back(t);
+  cubicCFDs.push_back(t);
 }
 
 void LendaEvent::pushLongGate(Double_t lg){
@@ -166,7 +167,7 @@ void LendaEvent::gainCor(){
 }
 
 void LendaEvent::Finalize(){
-
+  NumOfChannelsInEvent = times.size();//the number of channels pushed to event
   energiesCor.resize(energies.size());
 
  
@@ -190,27 +191,24 @@ void LendaEvent::Finalize(){
   }
   */
 
-  E0=energiesCor[0];
-  E1=energiesCor[1];
-  E2=energiesCor[2];
-  E3=energiesCor[3];
 
-
+  
   if (cubicTimes.size()==4)
     TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
   else 
     TOF=BAD_NUM;
+  
+  
+  
 
-
-  NumOfChannelsInEvent = times.size();//the number of channels pushed to event
-  PulseShape = longGates[2]/shortGates[2];
-
+  
   Dt = times[0]-times[1];
   
   CDt= cubicTimes[0]-cubicTimes[1];
 
   GOE = (energies[0]-energies[1])/(energies[0]+energies[1]);
   CorGOE = (energiesCor[0]-energiesCor[1])/(energiesCor[0]+energiesCor[1]);
+  
   //  posCor();  
 
   //  if (fwalkCorrections.size()!=0)
@@ -226,10 +224,16 @@ void LendaEvent::Finalize(){
   
     
   if ( NumOfChannelsInEvent==3){
+    
+    PulseShape = longGates[2]/shortGates[2];
+    
     Double_t c= 2.99 * TMath::Power(10,8);
     Double_t shift=(GammaPeakTime-0.334448);
     
     Double_t shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
+    
+    Double_t shiftTime2 =(0.5*(times[0]+times[1])-times[2]) - shift;
+    
     ShiftTOF=shiftTime;
     
     shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
@@ -240,6 +244,14 @@ void LendaEvent::Finalize(){
     TOFEnergy=KE;
 
 
+
+    shiftTime2 =10.0*shiftTime2*(1.0/(TMath::Power(10,9)));// put time in secs
+    
+    beta = (1.0/c)*(1.0/shiftTime2);
+    gamma = 1.0/(TMath::Sqrt(1-beta*beta));
+    KE = (gamma-1.0)*939.5650; // MEV
+    TOFEnergyInternal=KE;
+   
   }
   //ApplyDynamicCorrections();
 

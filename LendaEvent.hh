@@ -26,6 +26,7 @@ public:
   Double_t Dt; //Diference between Top and botom PMTs //__var
   Double_t ShiftTOF;
   Double_t TOFEnergy;
+  Double_t TOFEnergyInternal;
 
   Bool_t ErrorBit;
 
