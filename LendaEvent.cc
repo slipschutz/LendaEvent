@@ -17,7 +17,10 @@ LendaEvent::LendaEvent()
   fnumOfGainCorrections=0;
   
   GammaPeakTime=4.08274;
+  GammaPeakTime2=0.249663;
+  
 
+  TOFFudge=1.0;
   Clear();
 
 
@@ -63,11 +66,14 @@ void LendaEvent::Clear(){
   Dt=BAD_NUM;
   TOFEnergy=BAD_NUM;
   TOFEnergyInternal=BAD_NUM;
+
   ShiftTOF=BAD_NUM;
+  ShiftTOFInternal=BAD_NUM;
 
   NumBadPoints=0;
   ErrorBit=0;
 
+  
   
   GOE=BAD_NUM;
   CorGOE=BAD_NUM;
@@ -84,6 +90,7 @@ void LendaEvent::Clear(){
   cubicTimes.clear();
   cubicCFDs.clear();
 
+  pulseHeights.clear();
 
   Traces.clear();
   Filters.clear();
@@ -99,7 +106,7 @@ void LendaEvent::Clear(){
 
 
   NumOfChannelsInEvent=0;
-
+  N=NumOfChannelsInEvent;
 }
 
 void LendaEvent::pushTime(Double_t t){
@@ -154,6 +161,9 @@ void LendaEvent::pushInternEnergy(Double_t t){
   internEnergies.push_back(t);
 }
 
+void LendaEvent::pushPulseHeight(Double_t t){
+  pulseHeights.push_back(t);
+}
 
 void LendaEvent::gainCor(){
 
@@ -168,6 +178,7 @@ void LendaEvent::gainCor(){
 
 void LendaEvent::Finalize(){
   NumOfChannelsInEvent = times.size();//the number of channels pushed to event
+  N=NumOfChannelsInEvent;
   energiesCor.resize(energies.size());
 
  
@@ -190,16 +201,11 @@ void LendaEvent::Finalize(){
     }
   }
   */
-
-
   
   if (cubicTimes.size()==4)
     TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
   else 
     TOF=BAD_NUM;
-  
-  
-  
 
   
   Dt = times[0]-times[1];
@@ -222,39 +228,51 @@ void LendaEvent::Finalize(){
   }
 
   
-    
+  Double_t shiftTime=BAD_NUM;
+  Double_t shiftTime2=BAD_NUM;
   if ( NumOfChannelsInEvent==3){
-    
+  
     PulseShape = longGates[2]/shortGates[2];
-    
-    Double_t c= 2.99 * TMath::Power(10,8);
     Double_t shift=(GammaPeakTime-0.334448);
-    
-    Double_t shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
-    
-    Double_t shiftTime2 =(0.5*(times[0]+times[1])-times[2]) - shift;
-    
-    ShiftTOF=shiftTime;
-    
-    shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
-    
-    Double_t beta = (1.0/c)*(1.0/shiftTime);
-    Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
-    Double_t KE = (gamma-1.0)*939.5650; // MEV
-    TOFEnergy=KE;
+    shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
+    shiftTime2 =(0.5*(times[0]+times[1])-times[2]) - shift;
+    shiftTime=shiftTime/TOFFudge;
+    shiftTime2=shiftTime2/TOFFudge;
 
+  } else if (NumOfChannelsInEvent==2){   //For liquid scint case
 
+    Double_t shift=(GammaPeakTime2-0.334448);
+    shiftTime = cubicTimes[0]-cubicTimes[1] - shift;
+    shiftTime2 = times[0]-times[1]- shift;
+    shiftTime=shiftTime/TOFFudge;
+    shiftTime2=shiftTime2/TOFFudge;
 
-    shiftTime2 =10.0*shiftTime2*(1.0/(TMath::Power(10,9)));// put time in secs
-    
-    beta = (1.0/c)*(1.0/shiftTime2);
-    gamma = 1.0/(TMath::Sqrt(1-beta*beta));
-    KE = (gamma-1.0)*939.5650; // MEV
-    TOFEnergyInternal=KE;
-   
   }
-  //ApplyDynamicCorrections();
+  ShiftTOF=shiftTime;
+  ShiftTOFInternal=shiftTime2;
+  Double_t c= 2.99 * TMath::Power(10,8);    
+  shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
+  
+  Double_t beta = (1.0/c)*(1.0/shiftTime);
+  Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
+  Double_t KE = (gamma-1.0)*939.5650; // MEV
+  TOFEnergy=KE;
 
+  
+  
+  shiftTime2 =10.0*shiftTime2*(1.0/(TMath::Power(10,9)));// put time in secs
+  
+  beta = (1.0/c)*(1.0/shiftTime2);
+  gamma = 1.0/(TMath::Sqrt(1-beta*beta));
+  KE = (gamma-1.0)*939.5650; // MEV
+  TOFEnergyInternal=KE;
+  
+  //   if (NumOfChannelsInEvent==2){
+  //     cout<<"Shift Time 2 "<<shiftTime2<<endl;
+  //     cout<<"channels "<<channels[0]<<" "<<channels[1]<<endl;
+  // }
+  //ApplyDynamicCorrections();
+  
 }
 
 
@@ -335,9 +353,10 @@ LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
   this->softTimes = right.softTimes;
   this->cubicTimes = right.cubicTimes;
   this->energies = right.energies;
-  this->internEnergies=right.energies;
+  this->internEnergies=right.internEnergies;
   this->channels = right.channels;
   this->softwareCFDs =right.softwareCFDs;
+  this->cubicCFDs =right.cubicCFDs;
   this->internalCFDs =right.internalCFDs;
   this->entryNums=right.entryNums;
   this->Traces = right.Traces;
@@ -346,6 +365,13 @@ LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
   this->longGates =right.longGates;
   this->shortGates =right.shortGates;
 
+  //to prevent mismatch in sizes between different 
+  //versions with different features
+  this->softwareCFDs.resize(this->times.size(),-1);
+  this->cubicCFDs.resize(this->times.size(),-1);
+  this->longGates.resize(this->times.size(),-1);
+  this->shortGates.resize(this->times.size(),-1);
+  this->pulseHeights.resize(this->times.size(),-1);
   
   return *this;
 

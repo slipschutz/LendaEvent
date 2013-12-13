@@ -25,8 +25,10 @@ public:
   Double_t TOF; // Time of flight //__var
   Double_t Dt; //Diference between Top and botom PMTs //__var
   Double_t ShiftTOF;
+  Double_t ShiftTOFInternal; //Shift TOF for internal Tumes 
   Double_t TOFEnergy;
   Double_t TOFEnergyInternal;
+
 
   Bool_t ErrorBit;
 
@@ -37,6 +39,8 @@ public:
 
   Double_t CDt;//__var
 
+  Int_t N;
+
   Int_t NumBadPoints;//__var
 
   Double_t PulseShape; //long gate over short gate  //__var
@@ -44,9 +48,15 @@ public:
   Double_t CorGOE;//Center of Gravity after gain matching //__var
 
   Double_t GammaPeakTime;
+  Double_t GammaPeakTime2;
+  
+  Double_t TOFFudge;
+  
 
   //  vector<Double_t> Corrections;
+  #ifndef __CINT__
   map <string,int> CorMap;
+  #endif
   //Main information holders
   vector <Double_t> energiesCor; //the corrected energies 
   vector <Double_t> times; //the times
@@ -62,6 +72,8 @@ public:
 
   vector <Double_t> shortGates;  //short gate energies
   vector <Double_t> longGates;  //long gate energies
+
+  vector <Double_t> pulseHeights;
 
   //The Traces and Filters
   vector < vector <UShort_t> > Traces; // a vector of vectors holding the traces if present
@@ -94,6 +106,8 @@ public:
   void pushCubicTime(Double_t);
   void pushCubicCFD(Double_t);
 
+  void pushPulseHeight(Double_t);
+
   Int_t NumOfChannelsInEvent; //The Number of channels associated with this event
 
 
@@ -102,7 +116,10 @@ public:
   void setGainCorrections(Double_t slope,Double_t c,Int_t channel);//sets the gain correction for a channel
   void setGainCorrections(vector <pair <Double_t,Double_t> > );//wrapper to the above assumes the vector has channel 0 at 
                                               //index 0 and channel 1 at index 1 ...
+
   inline void SetGammaPeakTime(Double_t t){GammaPeakTime=t;}
+  inline void SetGammaPeakTime2(Double_t t){GammaPeakTime2=t;}
+  inline void SetTOFFudge(Double_t t){TOFFudge=t;}
   void DumpGainCorrections();
   void DumpAllCorrections();
 
@@ -128,7 +145,7 @@ private:
 
   
 public:
-  ClassDef(LendaEvent, 14);
+  ClassDef(LendaEvent, 18);
 };
 
 #endif

@@ -1,4 +1,4 @@
-ltCXX=$(shell root-config --cxx)
+CXX=$(shell root-config --cxx)
 CFLAGS=-c -g -Wall $(shell root-config --cflags) -I./src -I ./include 
 LDLIBS=$(shell root-config --glibs)
 LDFLAGS=$(shell root-config --ldflags)
