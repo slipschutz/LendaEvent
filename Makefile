@@ -24,9 +24,9 @@ HEAD=$(addsuffic .hh,$(NAME))
 
 all: $(LIBRARY) 
 
-$(LIBRARY) : $(OBJECT) $(EXTRAOBJS) $(DICTOBJ) $(EXTRAHEADS) $(HEAD)
+$(LIBRARY) : $(OBJECT) $(EXTRAOBJS) $(DICTOBJ) $(EXTRAHEADS) $(HEAD) 
 	@echo "Building Library"
-	@$(CXX) `root-config --cflags` -fPIC -shared -o $@ $^
+	@$(CXX) `root-config --cflags` -fPIC -L/user/lipschut/Settings/ -lSettings -shared -o $@ $^
 	@echo "Build succeed"
 
 %Dictionary.o : %.hh $(EXTRAHEADS) %LinkDef.h

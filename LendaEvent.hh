@@ -6,7 +6,7 @@
 #include "Correctable.hh"
 #include <vector>
 #include <map>
-
+#include "Settings.hh"
 using namespace std;
 
 class LendaEvent :  public Correctable  {
@@ -32,10 +32,6 @@ public:
 
   Bool_t ErrorBit;
 
-  Double_t E0;//__var
-  Double_t E1;//__var
-  Double_t E2;//__var
-  Double_t E3;//__var
 
   Double_t CDt;//__var
 
@@ -48,7 +44,7 @@ public:
   Double_t CorGOE;//Center of Gravity after gain matching //__var
 
   Double_t GammaPeakTime;
-  Double_t GammaPeakTime2;
+  Double_t GammaPeakTimeLiqLiq;
   
   Double_t TOFFudge;
   
@@ -118,7 +114,7 @@ public:
                                               //index 0 and channel 1 at index 1 ...
 
   inline void SetGammaPeakTime(Double_t t){GammaPeakTime=t;}
-  inline void SetGammaPeakTime2(Double_t t){GammaPeakTime2=t;}
+  inline void SetGammaPeakTimeLiqLiq(Double_t t){GammaPeakTimeLiqLiq=t;}
   inline void SetTOFFudge(Double_t t){TOFFudge=t;}
   void DumpGainCorrections();
   void DumpAllCorrections();
@@ -131,6 +127,9 @@ public:
 
 
   void Fatal();//overload this stupid inherited method
+
+
+  void WriteSettings(Settings * theSettings);
 
 private:
 
@@ -145,7 +144,7 @@ private:
 
   
 public:
-  ClassDef(LendaEvent, 18);
+  ClassDef(LendaEvent, 19);
 };
 
 #endif

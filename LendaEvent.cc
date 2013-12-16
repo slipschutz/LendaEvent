@@ -17,7 +17,7 @@ LendaEvent::LendaEvent()
   fnumOfGainCorrections=0;
   
   GammaPeakTime=4.08274;
-  GammaPeakTime2=0.249663;
+  GammaPeakTimeLiqLiq=0.249663;
   
 
   TOFFudge=1.0;
@@ -32,7 +32,14 @@ LendaEvent::LendaEvent(bool BuildMap){
   
 }
 
-
+void LendaEvent::WriteSettings(Settings * theSettings){
+  theSettings->PushLine("####Settings From the LendaEvent####\n");
+  stringstream line;
+  line<<"TOF Fudge "<<TOFFudge<<endl;
+  line<<"GammaPeakTime "<<GammaPeakTime<<endl;
+  line<<"GammaPeakTimeLiqLiq "<<GammaPeakTimeLiqLiq<<endl;
+  theSettings->PushLine(line.str());
+}
 
 void LendaEvent::setGainCorrections(vector <pair <Double_t,Double_t> > in ){
   for (int i=0;i<(int)in.size();i++)
@@ -106,7 +113,7 @@ void LendaEvent::Clear(){
 
 
   NumOfChannelsInEvent=0;
-  N=NumOfChannelsInEvent;
+  N=0;
 }
 
 void LendaEvent::pushTime(Double_t t){
@@ -177,9 +184,10 @@ void LendaEvent::gainCor(){
 }
 
 void LendaEvent::Finalize(){
-  NumOfChannelsInEvent = times.size();//the number of channels pushed to event
-  N=NumOfChannelsInEvent;
-  energiesCor.resize(energies.size());
+ 
+ NumOfChannelsInEvent = times.size();//the number of channels pushed to event
+ N=NumOfChannelsInEvent;
+ energiesCor.resize(N);
 
  
   if (fgainCorrections.size()!=0)//only apply gain correctins if 
@@ -202,35 +210,31 @@ void LendaEvent::Finalize(){
   }
   */
   
-  if (cubicTimes.size()==4)
-    TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
-  else 
-    TOF=BAD_NUM;
+  // if (cubicTimes.size()==4)
+  //   TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
+  // else 
+  //   TOF=BAD_NUM;
 
-  
-  Dt = times[0]-times[1];
-  
-  CDt= cubicTimes[0]-cubicTimes[1];
+  if( NumOfChannelsInEvent == 2 ){  
+    Dt = times[0]-times[1];
+    CDt= cubicTimes[0]-cubicTimes[1];
+    GOE = (energies[0]-energies[1])/(energies[0]+energies[1]);
+    CorGOE = (energiesCor[0]-energiesCor[1])/(energiesCor[0]+energiesCor[1]);
+  }
 
-  GOE = (energies[0]-energies[1])/(energies[0]+energies[1]);
-  CorGOE = (energiesCor[0]-energiesCor[1])/(energiesCor[0]+energiesCor[1]);
-  
-  //  posCor();  
 
-  //  if (fwalkCorrections.size()!=0)
-  //  walkCor();
   for (int i=0;i<energies.size();i++){
-    if (energies[i]<0 || softwareCFDs[i]<0 ){
+    if (energies[i]<0 || softwareCFDs[i]<0 || cubicCFDs[i]<0){
       ErrorBit=true;
       break;
     }
-
   }
 
   
   Double_t shiftTime=BAD_NUM;
   Double_t shiftTime2=BAD_NUM;
-  if ( NumOfChannelsInEvent==3){
+  if ( NumOfChannelsInEvent == 3 ){ //TOF Energy Calculation
+    //For case with lenda and the trigger scintilator
   
     PulseShape = longGates[2]/shortGates[2];
     Double_t shift=(GammaPeakTime-0.334448);
@@ -239,24 +243,29 @@ void LendaEvent::Finalize(){
     shiftTime=shiftTime/TOFFudge;
     shiftTime2=shiftTime2/TOFFudge;
 
-  } else if (NumOfChannelsInEvent==2){   //For liquid scint case
+  } else if (NumOfChannelsInEvent==2){ //TOF Energy Calculation
+    //For the case of the two liquid scintilators 
 
-    Double_t shift=(GammaPeakTime2-0.334448);
+    Double_t shift=(GammaPeakTimeLiqLiq-0.334448);
     shiftTime = cubicTimes[0]-cubicTimes[1] - shift;
     shiftTime2 = times[0]-times[1]- shift;
     shiftTime=shiftTime/TOFFudge;
     shiftTime2=shiftTime2/TOFFudge;
 
   }
+  //Shift Time vs Shifttime2 is about the internal
+  //vs the cubic  times.  Not about the lenda liq vs liq liz cases
+  //in both cases calculate Energy from both
   ShiftTOF=shiftTime;
   ShiftTOFInternal=shiftTime2;
+
   Double_t c= 2.99 * TMath::Power(10,8);    
   shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
   
   Double_t beta = (1.0/c)*(1.0/shiftTime);
   Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   Double_t KE = (gamma-1.0)*939.5650; // MEV
-  TOFEnergy=KE;
+  TOFEnergy=KE; //Store Resulting TOF Energy in Class Variable
 
   
   
@@ -265,7 +274,7 @@ void LendaEvent::Finalize(){
   beta = (1.0/c)*(1.0/shiftTime2);
   gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   KE = (gamma-1.0)*939.5650; // MEV
-  TOFEnergyInternal=KE;
+  TOFEnergyInternal=KE; //Store Resulting TOF Energy from internal times in Class Var
   
   //   if (NumOfChannelsInEvent==2){
   //     cout<<"Shift Time 2 "<<shiftTime2<<endl;
@@ -382,10 +391,6 @@ LendaEvent & LendaEvent::operator = (const LendaEvent&  right){
 void LendaEvent::DefineMap(){
 theVariableMap["TOF"]=&TOF;
 theVariableMap["Dt"]=&Dt;
-theVariableMap["E0"]=&E0;
-theVariableMap["E1"]=&E1;
-theVariableMap["E2"]=&E2;
-theVariableMap["E3"]=&E3;
 theVariableMap["CDt"]=&CDt;
 theVariableMap["NumBadPoints"]=&NumBadPoints;
 theVariableMap["PulseShape"]=&PulseShape;
