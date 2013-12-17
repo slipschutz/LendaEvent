@@ -29,7 +29,7 @@ all: $(LIBRARY)
 
 $(LIBRARY) : $(OBJECT) $(EXTRAOBJS) $(DICTOBJ) $(EXTRAHEADS) $(HEAD) 
 	@echo "Building Library"
-	@$(CXX) `root-config --cflags` -fPIC -Wl,-rpath,$(LENDAHEAD)/LendaCommonLib -L$(LENDAHEAD)/LendaCommonLib -lSettings -shared -o $@ $^
+	@$(CXX) `root-config --cflags` -fPIC -shared -o $@ $^
 	@echo "Build succeed"
 
 %Dictionary.o : %.hh $(EXTRAHEADS) %LinkDef.h
