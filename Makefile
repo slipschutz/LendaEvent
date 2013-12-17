@@ -1,5 +1,7 @@
+LENDAHEAD=$(shell echo $$LENDAHEAD)
 CXX=$(shell root-config --cxx)
-CFLAGS=-c -g -Wall $(shell root-config --cflags) -I./src -I ./include 
+CFLAGS=-c -g -Wall $(shell root-config --cflags)
+INCLUDES= -I./include -I$(LENDAHEAD)/LendaCommonInclude
 LDLIBS=$(shell root-config --glibs)
 LDFLAGS=$(shell root-config --ldflags)
 #SOURCES=./src/SL_Event.cc ./src/FileManager.cc ./src/Filter.cc
@@ -11,6 +13,7 @@ EXTRAHEADS=$(patsubst %.cc,%.hh,$(EXTRASOURCE))
 ROOTCINT=rootcint
 
 NAME=LendaEvent
+
 
 
 temp= $(addprefix lib,$(NAME))
@@ -26,14 +29,14 @@ all: $(LIBRARY)
 
 $(LIBRARY) : $(OBJECT) $(EXTRAOBJS) $(DICTOBJ) $(EXTRAHEADS) $(HEAD) 
 	@echo "Building Library"
-	@$(CXX) `root-config --cflags` -fPIC -L/user/lipschut/Settings/ -lSettings -shared -o $@ $^
+	@$(CXX) `root-config --cflags` -fPIC -Wl,-rpath,$(LENDAHEAD)/LendaCommonLib -L$(LENDAHEAD)/LendaCommonLib -lSettings -shared -o $@ $^
 	@echo "Build succeed"
 
 %Dictionary.o : %.hh $(EXTRAHEADS) %LinkDef.h
 	@echo "Generating Dictionary"
-	@$(ROOTCINT) -f $(patsubst %.o,%.cc,$@) -c $^;
+	@$(ROOTCINT) -f $(patsubst %.o,%.cc,$@) -c $(INCLUDES) $^;
 	@echo "Compiling Dicionary"
-	@$(CXX) -p -fPIC $(CFLAGS) -c $(patsubst %.o,%.cc,$@)
+	@$(CXX) -p -fPIC $(CFLAGS) $(INCLUDES) -c $(patsubst %.o,%.cc,$@)
 
 %Parsed.o : %.cc %.hh
 	@echo "Making parsed file for" $< "..."
@@ -43,12 +46,13 @@ $(LIBRARY) : $(OBJECT) $(EXTRAOBJS) $(DICTOBJ) $(EXTRAHEADS) $(HEAD)
 
 %.o : %.cc
 	@echo "Compiling" $< "..."
-	@$(CXX) $(CFLAGS) -fPIC $< -o $@ 
+	@$(CXX) $(CFLAGS) $(INCLUDES) -fPIC $< -o $@ 
 
 test:
 	@echo $(LIBRARY) : $(DICTOBJ) $(OBJECTS)
 	echo $(EXTRAOBJS)
-	echo $(FOO)
+	@echo $(INCLUDES)
+
 
 
 clean:
