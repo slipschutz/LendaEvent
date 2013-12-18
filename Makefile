@@ -17,8 +17,8 @@ NAME=LendaEvent
 
 
 temp= $(addprefix lib,$(NAME))
-temp2=$(addsuffix $(LDFLAGS),$(temp))
-LIBRARY= $(addsuffix .so,$(temp2))
+#temp2=$(addsuffix $(LDFLAGS),$(temp))
+LIBRARY= $(addsuffix .so,$(temp))
 DICTNAME=$(addsuffix Dictionary,$(NAME))
 DICTOBJ=$(addsuffix .o,$(DICTNAME))
 OBJECT=$(addsuffix .o, $(NAME))
