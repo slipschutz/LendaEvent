@@ -48,6 +48,7 @@ public:
   
   Double_t TOFFudge;
   
+  vector <Bool_t> OverFlows;
 
   //  vector<Double_t> Corrections;
   #ifndef __CINT__

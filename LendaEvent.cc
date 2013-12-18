@@ -96,7 +96,7 @@ void LendaEvent::Clear(){
   softTimes.clear();
   cubicTimes.clear();
   cubicCFDs.clear();
-
+  OverFlows.clear();
   pulseHeights.clear();
 
   Traces.clear();
@@ -188,27 +188,23 @@ void LendaEvent::Finalize(){
  NumOfChannelsInEvent = times.size();//the number of channels pushed to event
  N=NumOfChannelsInEvent;
  energiesCor.resize(N);
-
+ OverFlows.resize(N,false); //Resize and make defualt false
  
   if (fgainCorrections.size()!=0)//only apply gain correctins if 
     gainCor();                   //they have be provided
 
-  /*
+
   if (Traces.size()!=0){
     for (int j=0;j<Traces.size();j++){
-      double avg =0;
-      if (Traces[j].size()>20){
-	for (int a=0;a<20;a++)
-	  avg = Traces[j][a] +avg;
-	avg=avg/20.0;
-	for (int i=0;i<Traces[j].size();i++){
-	  if (Traces[j][i]< 0.9*avg)
-	    NumBadPoints++;
+      for (int i=0;i<Traces[j].size();i++){
+	if ( Traces[j][i]>4095 ){
+	  OverFlows[j]=true;
+	  i=Traces[j].size()+1; //End loop over the trace
+	  //if an overflow is found
 	}
       }
     }
   }
-  */
   
   // if (cubicTimes.size()==4)
   //   TOF = 0.5*(cubicTimes[0]+cubicTimes[1]- cubicTimes[2]-cubicTimes[3]);
