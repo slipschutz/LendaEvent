@@ -31,7 +31,8 @@ public:
 
 
   Bool_t ErrorBit;
-
+  
+  Bool_t lean;//Flag for whether to save traces/filters
 
   Double_t CDt;//__var
 
@@ -117,6 +118,8 @@ public:
   inline void SetGammaPeakTime(Double_t t){GammaPeakTime=t;}
   inline void SetGammaPeakTimeLiqLiq(Double_t t){GammaPeakTimeLiqLiq=t;}
   inline void SetTOFFudge(Double_t t){TOFFudge=t;}
+  inline void SetLean(Bool_t b){lean=b;}
+
   void DumpGainCorrections();
   void DumpAllCorrections();
 

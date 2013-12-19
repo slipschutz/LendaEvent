@@ -19,6 +19,7 @@ LendaEvent::LendaEvent()
   GammaPeakTime=4.08274;
   GammaPeakTimeLiqLiq=0.249663;
   
+  lean=false;//Defualt to false for lean
 
   TOFFudge=1.0;
   Clear();
@@ -278,6 +279,11 @@ void LendaEvent::Finalize(){
   // }
   //ApplyDynamicCorrections();
   
+  if (lean == true ){
+    Traces.clear();
+    Filters.clear();
+    CFDs.clear();
+  }
 }
 
 
