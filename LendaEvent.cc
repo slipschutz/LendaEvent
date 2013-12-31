@@ -198,7 +198,7 @@ void LendaEvent::Finalize(){
   if (Traces.size()!=0){
     for (int j=0;j<Traces.size();j++){
       for (int i=0;i<Traces[j].size();i++){
-	if ( Traces[j][i]>4095 ){
+	if ( Traces[j][i]>4094 ){
 	  OverFlows[j]=true;
 	  i=Traces[j].size()+1; //End loop over the trace
 	  //if an overflow is found
