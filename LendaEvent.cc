@@ -190,7 +190,7 @@ void LendaEvent::Finalize(){
  N=NumOfChannelsInEvent;
  energiesCor.resize(N);
  OverFlows.resize(N,false); //Resize and make defualt false
- 
+  
   if (fgainCorrections.size()!=0)//only apply gain correctins if 
     gainCor();                   //they have be provided
 
