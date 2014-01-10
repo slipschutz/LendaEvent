@@ -233,6 +233,7 @@ void LendaEvent::Finalize(){
   if ( NumOfChannelsInEvent == 3 ){ //TOF Energy Calculation
     //For case with lenda and the trigger scintilator
   
+    TOF=(0.5*(times[0]+times[1])-times[2]);//Raw Internal TOF
     PulseShape = longGates[2]/shortGates[2];
     Double_t shift=(GammaPeakTime-0.334448);
     shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
@@ -242,7 +243,7 @@ void LendaEvent::Finalize(){
 
   } else if (NumOfChannelsInEvent==2){ //TOF Energy Calculation
     //For the case of the two liquid scintilators 
-
+    TOF=times[0]-times[1];
     Double_t shift=(GammaPeakTimeLiqLiq-0.334448);
     shiftTime = cubicTimes[0]-cubicTimes[1] - shift;
     shiftTime2 = times[0]-times[1]- shift;
