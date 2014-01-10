@@ -38,6 +38,8 @@ public:
 
   Int_t N;
 
+
+  
   Int_t NumBadPoints;//__var
 
   Double_t PulseShape; //long gate over short gate  //__var
@@ -50,7 +52,7 @@ public:
   Double_t TOFFudge;
   
   vector <Bool_t> OverFlows;
-
+  vector <Int_t > ZeroCrossings;
   //  vector<Double_t> Corrections;
   #ifndef __CINT__
   map <string,int> CorMap;
@@ -105,7 +107,7 @@ public:
   void pushCubicCFD(Double_t);
 
   void pushPulseHeight(Double_t);
-
+  void pushNumZeroCrossings(Int_t);
   Int_t NumOfChannelsInEvent; //The Number of channels associated with this event
 
 

@@ -108,13 +108,16 @@ void LendaEvent::Clear(){
 
   shortGates.clear();
   longGates.clear();
-
+  ZeroCrossings.clear();
   
   // heDynamicCorrectionResults.clear();
 
 
   NumOfChannelsInEvent=0;
   N=0;
+}
+void LendaEvent::pushNumZeroCrossings(Int_t t){
+  ZeroCrossings.push_back(t);
 }
 
 void LendaEvent::pushTime(Double_t t){
