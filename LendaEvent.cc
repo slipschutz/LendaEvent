@@ -259,7 +259,7 @@ void LendaEvent::Finalize(){
   Double_t c= 2.99 * TMath::Power(10,8);    
   shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
   
-  Double_t beta = (1.0/c)*(1.0/shiftTime);
+  Double_t beta = (1.0/c)*(1.0125/shiftTime);//1 Meter to bar plus half thickness of bar
   Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   Double_t KE = (gamma-1.0)*939.5650; // MEV
   TOFEnergy=KE; //Store Resulting TOF Energy in Class Variable
@@ -268,7 +268,7 @@ void LendaEvent::Finalize(){
   
   shiftTime2 =10.0*shiftTime2*(1.0/(TMath::Power(10,9)));// put time in secs
   
-  beta = (1.0/c)*(1.0/shiftTime2);
+  beta = (1.0/c)*(1.0125/shiftTime2); //1 Meter to bar plus half thickness of bar
   gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   KE = (gamma-1.0)*939.5650; // MEV
   TOFEnergyInternal=KE; //Store Resulting TOF Energy from internal times in Class Var
