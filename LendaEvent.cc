@@ -254,11 +254,20 @@ void LendaEvent::Finalize(){
     shiftTime2=shiftTime2/TOFFudge;
 
   }
+
   //Shift Time vs Shifttime2 is about the internal
   //vs the cubic  times.  Not about the lenda liq vs liq liz cases
   //in both cases calculate Energy from both
   ShiftTOF=shiftTime;
   ShiftTOFInternal=shiftTime2;
+  //Now make negaive TOF positive for later bkg spectra
+  if (shiftTime<0){
+    shiftTime=-1*shiftTime;
+  }
+  if (shiftTime2<0){
+    shiftTime2=-1*shiftTime2;
+  }
+  
 
   Double_t c= 2.99 * TMath::Power(10,8);    
   shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
