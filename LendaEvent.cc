@@ -16,8 +16,11 @@ LendaEvent::LendaEvent()
 
   fnumOfGainCorrections=0;
   
-  GammaPeakTime=4.08274;
-  GammaPeakTimeLiqLiq=0.249663;
+  //   GammaPeakTime=4.08274;
+  // GammaPeakTimeLiqLiq=0.249663;
+  
+  GammaPeakTime=4.08761;
+  GammaPeakTimeLiqLiq=0.261353;
   
   lean=false;//Defualt to false for lean
 
@@ -233,26 +236,30 @@ void LendaEvent::Finalize(){
   
   Double_t shiftTime=BAD_NUM;
   Double_t shiftTime2=BAD_NUM;
+  Double_t distance=BAD_NUM; //Distance from src to cernter of detector in m
+  //
+  //Lenda at 1 m + halft Thickness =1.0125m
+  //Ref Scint at 100.25 cm + 0.14 cm(housing) +5.25 =1.03015
   if ( NumOfChannelsInEvent == 3 ){ //TOF Energy Calculation
     //For case with lenda and the trigger scintilator
-  
+    
     TOF=(0.5*(times[0]+times[1])-times[2]);//Raw Internal TOF
     PulseShape = longGates[2]/shortGates[2];
-    Double_t shift=(GammaPeakTime-0.334448);
+    Double_t shift=(GammaPeakTime-0.337734); //Lenda Bar at 1.00 m + half thickness
     shiftTime = (0.5*(cubicTimes[0]+cubicTimes[1])-cubicTimes[2]) - shift;
     shiftTime2 =(0.5*(times[0]+times[1])-times[2]) - shift;
     shiftTime=shiftTime/TOFFudge;
     shiftTime2=shiftTime2/TOFFudge;
-
+    distance=1.0125;
   } else if (NumOfChannelsInEvent==2){ //TOF Energy Calculation
     //For the case of the two liquid scintilators 
     TOF=times[0]-times[1];
-    Double_t shift=(GammaPeakTimeLiqLiq-0.334448);
+    Double_t shift=(GammaPeakTimeLiqLiq-0.3343621); //Ref at 100.25 cm + 0.14 cm(housing) +5.25/2
     shiftTime = cubicTimes[0]-cubicTimes[1] - shift;
     shiftTime2 = times[0]-times[1]- shift;
     shiftTime=shiftTime/TOFFudge;
     shiftTime2=shiftTime2/TOFFudge;
-
+    distance=1.03015;
   }
 
   //Shift Time vs Shifttime2 is about the internal
@@ -269,10 +276,10 @@ void LendaEvent::Finalize(){
   }
   
 
-  Double_t c= 2.99 * TMath::Power(10,8);    
+  Double_t c = 299792458.0;    
   shiftTime =10.0*shiftTime*(1.0/(TMath::Power(10,9)));// put time in secs
   
-  Double_t beta = (1.0/c)*(1.0125/shiftTime);//1 Meter to bar plus half thickness of bar
+  Double_t beta = (1.0/c)*(distance/shiftTime);//Distance set above
   Double_t gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   Double_t KE = (gamma-1.0)*939.5650; // MEV
   TOFEnergy=KE; //Store Resulting TOF Energy in Class Variable
@@ -281,7 +288,7 @@ void LendaEvent::Finalize(){
   
   shiftTime2 =10.0*shiftTime2*(1.0/(TMath::Power(10,9)));// put time in secs
   
-  beta = (1.0/c)*(1.0125/shiftTime2); //1 Meter to bar plus half thickness of bar
+  beta = (1.0/c)*(distance/shiftTime2); //1 Meter to bar plus half thickness of bar
   gamma = 1.0/(TMath::Sqrt(1-beta*beta));
   KE = (gamma-1.0)*939.5650; // MEV
   TOFEnergyInternal=KE; //Store Resulting TOF Energy from internal times in Class Var
